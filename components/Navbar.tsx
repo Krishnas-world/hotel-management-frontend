@@ -21,11 +21,8 @@ import { cn } from "@/lib/utils"
 
 const NAV_LINKS = [
   { href: "#home", label: "Home" },
-  // Updated links for smooth scrolling to sections
   { href: "#rooms", label: "Rooms" },
-
-  // Add other top-level links like Contact, Gallery, etc. here if needed
-  // { href: "#contact", label: "Contact" },
+  { href: "#contact", label: "Contact" },
   // { href: "#gallery", label: "Gallery" },
 ]
 
@@ -47,15 +44,13 @@ export default function Navbar() {
 
         <nav className="hidden lg:flex items-center space-x-6">
           <NavigationMenu>
-            {/* Simplified: Map all links directly */}
             <NavigationMenuList className="flex items-center space-x-4">
               {NAV_LINKS.map((link) => (
                 <NavigationMenuItem key={link.label}>
-                  {/* Use legacyBehavior and passHref with NavigationMenuLink */}
                   <Link href={link.href} legacyBehavior passHref>
                     <NavigationMenuLink className={cn(
                       navigationMenuTriggerStyle(), // Base shadcn trigger styles
-                      "bg-transparent text-white hover:text-amber-300 hover:bg-white/10 rounded-full transition-colors duration-200 ease-in-out" // Refined colors and transitions
+                      "bg-transparent text-white hover:text-amber-500 hover:bg-amber-400/10 rounded-full transition-colors duration-200 ease-in-out" // Refined colors and transitions
                     )}>
                       {link.label}
                     </NavigationMenuLink>
@@ -92,8 +87,6 @@ export default function Navbar() {
                 className="h-10 w-auto"
               />
             </div>
-            {/* Mobile Navigation Links */}
-            {/* Simplified: Map all links directly */}
             <div className="flex flex-col gap-5">
               {NAV_LINKS.map((link) => (
                  <Link
@@ -105,7 +98,6 @@ export default function Navbar() {
                     {link.label}
                   </Link>
               ))}
-              {/* Mobile Login Button */}
               <Link href="/login" passHref>
                  <Button
                    onClick={() => setOpen(false)}

@@ -10,19 +10,19 @@ export default function HeroSection() {
   const slides = [
     {
       image:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1725962479542-1be0a6b0d444?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       title: "LUXURY ACCOMMODATIONS",
       subtitle: "Experience the pinnacle of comfort and elegance",
     },
     {
       image:
-        "https://images.unsplash.com/photo-1561501878-aabd62634533?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1605588374530-984806df6b9f?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       title: "STUNNING OCEAN VIEWS",
       subtitle: "Wake up to breathtaking panoramas of the Arabian Sea",
     },
     {
       image:
-        "https://images.unsplash.com/photo-1584132869994-873f9363a562?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVnfDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1561501878-aabd62634533?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       title: "EXQUISITE DINING",
       subtitle: "Savor culinary masterpieces from world-class chefs",
     },
