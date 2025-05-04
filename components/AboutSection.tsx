@@ -1,50 +1,153 @@
-import Image from "next/image"
+"use client"
+import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { ArrowRight, Play, Pause, Volume2, VolumeX } from "lucide-react"
+import YouTube from "react-youtube"
+
+// Define types for YouTube player
+interface YouTubePlayer {
+  playVideo: () => void;
+  pauseVideo: () => void;
+  mute: () => void;
+  unMute: () => void;
+}
+
+interface YouTubeEvent {
+  target: YouTubePlayer;
+}
 
 export default function AboutSection() {
+  const playerRef = useRef<YouTubePlayer | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  
+  const onPlayerReady = (event: YouTubeEvent) => {
+    if (isPlaying) {
+      event.target.playVideo();
+    }
+    if (isMuted) {
+      event.target.mute();
+    }
+    playerRef.current = event.target;
+  };
+
+  const togglePlay = () => {
+    if (playerRef.current) {
+      if (isPlaying) {
+        playerRef.current.pauseVideo();
+      } else {
+        playerRef.current.playVideo();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const toggleMute = () => {
+    if (playerRef.current) {
+      if (isMuted) {
+        playerRef.current.unMute();
+      } else {
+        playerRef.current.mute();
+      }
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const getOpts = () => ({
+    height: '100%',
+    width: '100%',
+    playerVars: {
+      autoplay: 1,
+      loop: 4,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      modestbranding: 1,
+      rel: 0,
+      showinfo: 0,
+      mute: isMuted ? 1 : 0,
+      playsinline: 1,
+    },
+  });
+
   return (
-    <div className="py-16 px-4 md:px-8 bg-gray-50">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <div className="relative">
-          <div className="absolute top-4 left-4 z-10 flex items-center">
-            <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
-              1
-            </div>
-            <div className="bg-blue-500 rounded-full p-1 -ml-2">
-              <Image
-                src="/placeholder.svg?height=30&width=30"
-                alt="Hotel Icon"
-                width={30}
-                height={30}
-                className="rounded-full"
-              />
+    <section className="sm:py-10 md:py-10 px-4 sm:px-6 lg:px-8 bg-gray-100">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
+          <div className="relative order-1 md:order-1">
+            <div className="relative rounded-lg md:rounded-xl lg:rounded-2xl overflow-hidden shadow-xl group">
+              <div className="relative w-full aspect-video bg-black">
+                <YouTube
+                  videoId="mJVuZiK9a6I"
+                  opts={getOpts()}
+                  onReady={onPlayerReady}
+                  className="w-full h-full object-cover"
+                />
+                
+                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                  <Button 
+                    onClick={togglePlay} 
+                    variant="ghost" 
+                    size="icon" 
+                    className="bg-black bg-opacity-40 text-white rounded-full hover:bg-opacity-60 transition-all duration-300"
+                  >
+                    {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                  </Button>
+                  
+                  <Button 
+                    onClick={toggleMute} 
+                    variant="ghost" 
+                    size="icon" 
+                    className="bg-black bg-opacity-40 text-white rounded-full hover:bg-opacity-60 transition-all duration-300"
+                  >
+                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="absolute -bottom-5 -right-5 w-24 h-24 bg-amber-500 opacity-10 rounded-full blur-xl"></div>
             </div>
           </div>
-          <Image
-            src="/placeholder.svg?height=600&width=800"
-            alt="Luxury Hotel Room"
-            width={800}
-            height={600}
-            className="w-full h-auto rounded-lg shadow-xl"
-          />
-        </div>
-        <div className="pl-0 md:pl-8">
-          <div className="border-l-4 border-blue-500 pl-4 mb-6">
-            <div className="text-blue-500 font-medium mb-2">LUXURY SUITE COMFORT</div>
-            <h2 className="text-2xl font-bold mb-4">
-              LUXURY BEST HOTEL IN CITY
-              <br />
-              MANGALORE, KARNATAKA
-            </h2>
+          
+          <div className="order-2 md:order-2 pl-0 md:pl-6 lg:pl-10">
+            <div className="border-l-4 border-amber-500 pl-4 mb-6">
+              <span className="text-amber-500 font-medium text-sm tracking-wider">PREMIUM HOSPITALITY</span>
+              <h3 className="text-2xl md:text-3xl font-bold mt-2 leading-tight">
+                LUXURY LIVING IN MANGALORE
+              </h3>
+            </div>
+
+            <div className="text-gray-700 mb-8">
+              <p className="mb-4">
+                Experience unparalleled luxury in the heart of coastal Karnataka. Our hotel combines elegant design with premium amenities for a truly exceptional stay.
+              </p>
+              <p className="text-sm text-gray-500 italic">
+                Where comfort meets sophistication.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mb-8">
+              <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                <div className="text-amber-500 font-bold text-xl md:text-2xl">120+</div>
+                <div className="text-xs text-gray-500">Luxury Rooms</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                <div className="text-amber-500 font-bold text-xl md:text-2xl">24/7</div>
+                <div className="text-xs text-gray-500">Room Service</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                <div className="text-amber-500 font-bold text-xl md:text-2xl">4.9</div>
+                <div className="text-xs text-gray-500">Guest Rating</div>
+              </div>
+            </div>
+
+            <Button className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 group">
+              EXPLORE OUR HOTEL
+              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </Button>
           </div>
-          <p className="text-gray-600 mb-8">
-            Significantly Streamlined Cross-platform Intellectual Capital After Marketing Model. Appropriately Create
-            Extensive Interfaces After Maintainable Architectures. Distinctly Facilitate Timely Ideas Before
-            Integrated Consultants. Collaboratively Enhance Visionary Scenarios Economically.
-          </p>
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2">READ MORE</Button>
         </div>
       </div>
-    </div>
+    </section>
   )
-} 
+}

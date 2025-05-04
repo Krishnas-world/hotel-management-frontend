@@ -49,7 +49,7 @@ export default function Navbar() {
                 <NavigationMenuItem key={link.label}>
                   <Link href={link.href} legacyBehavior passHref>
                     <NavigationMenuLink className={cn(
-                      navigationMenuTriggerStyle(), // Base shadcn trigger styles
+                      navigationMenuTriggerStyle(),
                       "bg-transparent text-white hover:text-amber-500 hover:bg-amber-400/10 rounded-full transition-colors duration-200 ease-in-out" // Refined colors and transitions
                     )}>
                       {link.label}
@@ -75,9 +75,8 @@ export default function Navbar() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          {/* Mobile Sheet Content */}
           <SheetContent side="right" className="bg-black/95 text-white p-6 w-64 sm:w-72 border-l border-amber-700 overflow-y-auto">
-            {/* Mobile Logo in Sheet Header */}
+        
             <div className="flex justify-center mb-8">
               <Image
                 src="/logo.svg"
@@ -92,7 +91,7 @@ export default function Navbar() {
                  <Link
                     key={link.label}
                     href={link.href}
-                    onClick={() => setOpen(false)} // Close sheet on link click
+                    onClick={() => setOpen(false)} 
                     className="text-lg font-medium hover:text-amber-400 transition-colors block"
                   >
                     {link.label}
