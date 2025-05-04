@@ -71,7 +71,7 @@ export default function AboutSection() {
   });
 
   return (
-    <section className="sm:py-10 md:py-10 px-4 sm:px-6 lg:px-8 bg-gray-100">
+    <section className="sm:py-10 md:py-10 px-6 md:px-12 lg:px-24 sm:px-6 bg-gray-100">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
           <div className="relative order-1 md:order-1">
@@ -141,10 +141,7 @@ export default function AboutSection() {
               </div>
             </div>
 
-            <Button className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 group">
-              EXPLORE OUR HOTEL
-              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
+            
           </div>
         </div>
       </div>

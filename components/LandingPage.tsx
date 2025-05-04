@@ -2,6 +2,8 @@ import HeroSection from "./HeroSection"
 import RoomsSection from "./RoomsSection"
 import AboutSection from "./AboutSection"
 import BookingForm from "./BookingForm"
+import { Footer } from "./Footer"
+import { Facilities } from "./Facilities"
 
 export default function LandingPage() {
   return (
@@ -10,6 +12,10 @@ export default function LandingPage() {
       <RoomsSection />
       {/* About Hotel Section */}
       <AboutSection />
+      {/* Facilities */}
+      <Facilities />
+      {/* Footer Section */}
+      <Footer />
     </div>
   )
 }

@@ -10,9 +10,9 @@ export default function RoomsSection() {
       id: "1",
       type: "LUXURY ROOM",
       name: "Deluxe Family Rooms",
-      image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&q=80",
-      beds: "2 King Beds",
-      capacity: "4 Guests",
+      image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80",
+      beds: "1 King Beds",
+      capacity: "2 Guests",
       size: "45m²",
       amenities: "Breakfast Included"
     },
@@ -21,8 +21,8 @@ export default function RoomsSection() {
       type: "PREMIUM SUITE",
       name: "Superior Family Rooms",
       image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80",
-      beds: "1 King Bed + 2 Singles",
-      capacity: "4 Guests",
+      beds: "Double Bed",
+      capacity: "3 Guests",
       size: "52m²",
       amenities: "Breakfast Included"
     },
@@ -30,7 +30,7 @@ export default function RoomsSection() {
       id: "3",
       type: "EXECUTIVE SUITE",
       name: "Double Suite Rooms",
-      image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80",
+      image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&q=80",
       beds: "2 King Beds",
       capacity: "4 Guests",
       size: "65m²",
@@ -49,7 +49,7 @@ export default function RoomsSection() {
       </div>
 
 
-      <div className="px-4 md:px-6 lg:px-12 bg-gradient-to-b from-white to-gray-50 pt-16 pb-24" id="rooms">
+      <div className="px-6 md:px-12 lg:px-24 sm:px-6 bg-gradient-to-b from-white to-gray-50 pt-16 pb-24" id="rooms">
         <div className="max-w-7xl mx-auto">
 
           <div className="text-center mb-12 md:mb-16 relative">

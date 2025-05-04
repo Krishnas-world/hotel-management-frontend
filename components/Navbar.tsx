@@ -23,7 +23,6 @@ const NAV_LINKS = [
   { href: "#home", label: "Home" },
   { href: "#rooms", label: "Rooms" },
   { href: "#contact", label: "Contact" },
-  // { href: "#gallery", label: "Gallery" },
 ]
 
 export default function Navbar() {
@@ -78,13 +77,6 @@ export default function Navbar() {
           <SheetContent side="right" className="bg-black/95 text-white p-6 w-64 sm:w-72 border-l border-amber-700 overflow-y-auto">
         
             <div className="flex justify-center mb-8">
-              <Image
-                src="/logo.svg"
-                alt="Canara Resort Logo"
-                width={160}
-                height={40}
-                className="h-10 w-auto"
-              />
             </div>
             <div className="flex flex-col gap-5">
               {NAV_LINKS.map((link) => (
