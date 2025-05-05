@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 export const Facilities = () => {
     return (
         <div>
-            <section className="flex flex-col items-center justify-center bg-white py-16 px-6 md:px-12 lg:px-24 text-gray-800">
+            <section className="flex flex-col items-center justify-center bg-gray-100 py-16 px-6 md:px-12 lg:px-24 text-gray-800">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
                         World-Class Facilities
@@ -46,11 +46,8 @@ export const Facilities = () => {
             <section id="facilities" className="bg-white py-20 px-6 md:px-12 lg:px-24">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <p className="text-[#f59e0b] font-semibold uppercase tracking-wider text-sm mb-2">
-                        Facilities
-                    </p>
                     <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
-                        Enjoy Complete & Best Quality Facilities
+                    Other Facilities
                     </h2>
                     <p className="text-gray-600 text-lg max-w-2xl mx-auto">
                         From fitness to food, every aspect of your stay is curated for maximum comfort and luxury.

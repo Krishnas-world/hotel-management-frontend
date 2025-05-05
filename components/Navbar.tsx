@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils"
 const NAV_LINKS = [
   { href: "#home", label: "Home" },
   { href: "#rooms", label: "Rooms" },
+  { href: "#about", label: "About" },
   { href: "#contact", label: "Contact" },
 ]
 
@@ -29,7 +30,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-black/60 backdrop-blur-md shadow-lg transition-all duration-300 ease-in-out">
+    <header className="top-0 left-0 w-full z-50 bg-black/20 backdrop-blur-sm shadow-lg transition-all duration-300 ease-in-out">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <Image

@@ -71,7 +71,7 @@ export default function AboutSection() {
   });
 
   return (
-    <section className="sm:py-10 md:py-10 px-6 md:px-12 lg:px-24 sm:px-6 bg-gray-100">
+    <section className="sm:py-10 md:py-10 px-6 md:px-12 lg:px-24 sm:px-6 bg-gray-100" id="about">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
           <div className="relative order-1 md:order-1">

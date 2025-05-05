@@ -19,6 +19,7 @@ export default function BookingForm({ className }: any) {
   const [guests, setGuests] = useState<string>("");
   const [isRoomsPopoverOpen, setIsRoomsPopoverOpen] = useState(false);
   const [isGuestsPopoverOpen, setIsGuestsPopoverOpen] = useState(false);
+  const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
 
   const nights =
     dateRange?.from && dateRange?.to
@@ -54,12 +55,17 @@ export default function BookingForm({ className }: any) {
       return updated;
     });
   }
+  
   const handleRoomSelect = (num: number) => {
     const roomText = `${num} Room${num > 1 ? 's' : ''}`;
     setRooms(roomText);
     setIsRoomsPopoverOpen(false);
   };
 
+  // Function to handle the Done button click in calendar
+  const handleDateDone = () => {
+    setIsDatePopoverOpen(false);
+  };
 
   const updateGuestsText = (counts: { Adults: number, Children: number, Infants: number }) => {
     const summary = Object.entries(counts)
@@ -73,12 +79,49 @@ export default function BookingForm({ className }: any) {
     updateGuestsText(guestCounts);
   }, []);
 
-
   function handleGuestsApply() {
     updateGuestsText(guestCounts);
     setIsGuestsPopoverOpen(false); // Close popover on apply
   }
 
+  // Updated calendar component with proper separator between months in PC view
+  // In mobile view, we'll show only one month at a time
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  
+  const CalendarWithSeparator = (props: any) => (
+    <>
+      {/* Desktop view - show both months side by side with separator */}
+      <div className="hidden sm:flex sm:flex-row sm:items-start sm:justify-center">
+        <div className="flex-1">
+          <Calendar
+            {...props}
+            numberOfMonths={1}
+            className="p-3"
+          />
+        </div>
+        <div className="w-px bg-gray-200 dark:bg-gray-700 mx-2 self-stretch"></div>
+        <div className="flex-1">
+          <Calendar
+            {...props}
+            numberOfMonths={1}
+            defaultMonth={new Date(new Date().setMonth(new Date().getMonth() + 1))}
+            className="p-3"
+          />
+        </div>
+      </div>
+      
+      {/* Mobile view - show only one month at a time */}
+      <div className="block sm:hidden">
+        <Calendar
+          {...props}
+          numberOfMonths={1}
+          month={currentMonth}
+          onMonthChange={setCurrentMonth}
+          className="p-3"
+        />
+      </div>
+    </>
+  );
 
   return (
     <div
@@ -90,7 +133,7 @@ export default function BookingForm({ className }: any) {
     >
       <div className="flex flex-col md:flex-row md:items-center w-full">
         <div className="w-full md:flex-grow">
-          <Popover>
+          <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
@@ -99,10 +142,9 @@ export default function BookingForm({ className }: any) {
                   "rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
                 )}
               >
-
                 <div className="flex w-full items-center">
                   <CalendarIcon className="h-5 w-5 text-amber-600 mr-3 flex-shrink-0" />
-                  <div className="flex flex-col w-full overflow-hidden"> {/* Added overflow hidden */}
+                  <div className="flex flex-col w-full overflow-hidden">
                     <div className="flex justify-between w-full">
                       <span className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Check In</span>
                       <span className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 pr-4">Check Out</span>
@@ -125,32 +167,24 @@ export default function BookingForm({ className }: any) {
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className="w-auto p-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl"
-              align="start"
+              className="w-auto p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg"
+              align="center"
             >
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={setDateRange}
-                numberOfMonths={2}
-                disabled={(date) => isBefore(date, new Date(new Date().setHours(0, 0, 0, 0)))} // Disable past dates precisely
-                initialFocus
-                className="p-3"
-              />
-              <div className="flex items-center justify-between p-3 border-t border-gray-200 dark:border-gray-700">
-                {nights > 0 ? (
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <span className="font-bold text-amber-600">{nights}</span>{" "}
-                    night{nights > 1 ? "s" : ""} selected
-                  </p>
-                ) : <div />}
-                <Button
-                  className="bg-amber-600 hover:bg-amber-700 text-white"
-                  size="sm"
-                >
-                  Done
-                </Button>
+              <div className="w-full">
+                <CalendarWithSeparator
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  disabled={(date:Date) => isBefore(date, new Date(new Date().setHours(0, 0, 0, 0)))}
+                  initialFocus
+                />
               </div>
+              <Button
+                onClick={handleDateDone}
+                className="mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg"
+              >
+                Done
+              </Button>
             </PopoverContent>
           </Popover>
         </div>
@@ -181,17 +215,21 @@ export default function BookingForm({ className }: any) {
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className="w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2" // Added padding
-              align="start"
+              className="w-64 p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
+              align="center"
             >
-              <p className="text-sm font-semibold mb-2 px-2 text-gray-700 dark:text-gray-300">Select Rooms</p>
-              <div className="grid grid-cols-1 gap-1">
+              <div className="flex flex-wrap gap-2 justify-center">
                 {[1, 2, 3, 4, 5].map(num => (
                   <Button
                     key={num}
-                    variant="ghost"
+                    variant={rooms === `${num} Room${num > 1 ? 's' : ''}` ? "default" : "outline"}
                     size="sm"
-                    className="w-full justify-start hover:bg-gray-100 dark:hover:bg-gray-800 rounded" // Added rounding to buttons
+                    className={cn(
+                      "px-4 py-2 rounded-full",
+                      rooms === `${num} Room${num > 1 ? 's' : ''}` 
+                        ? "bg-amber-600 hover:bg-amber-700 text-white" 
+                        : "border border-gray-300 dark:border-gray-700"
+                    )}
                     onClick={() => handleRoomSelect(num)}
                   >
                     {num} Room{num > 1 ? 's' : ''}
@@ -205,9 +243,7 @@ export default function BookingForm({ className }: any) {
         <Separator orientation="horizontal" className="block md:hidden" />
         <Separator orientation="vertical" className="h-10 hidden md:block" />
 
-
         <div className="w-full md:flex-grow">
-
           <Popover open={isGuestsPopoverOpen} onOpenChange={setIsGuestsPopoverOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -217,10 +253,9 @@ export default function BookingForm({ className }: any) {
                   "rounded-none"
                 )}
               >
-
                 <div className="flex items-center w-full">
                   <User className="h-5 w-5 text-amber-600 mr-3 flex-shrink-0" />
-                  <div className="flex flex-col overflow-hidden"> {/* Added overflow hidden */}
+                  <div className="flex flex-col overflow-hidden">
                     <span className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Guests</span>
                     <span className="text-sm font-medium truncate">
                       {guests || "Select"}
@@ -230,34 +265,33 @@ export default function BookingForm({ className }: any) {
               </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 w-72 shadow-lg">
+            <PopoverContent className="p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg w-72" align="center">
               {(["Adults", "Children", "Infants"] as GuestType[]).map((type) => (
                 <div
                   key={type}
-                  className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800 last:border-0"
+                  className="flex justify-between items-center py-3"
                 >
                   <div>
-                    <p className="font-medium text-sm text-gray-800 dark:text-gray-200">{type}</p>
+                    <p className="font-medium text-gray-800 dark:text-gray-200">{type}</p>
                     {type === "Children" && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Ages 2-12</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Ages 2-12</p>
                     )}
                     {type === "Infants" && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Under 2</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Under 2</p>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 rounded-full border border-gray-300 dark:border-gray-700 disabled:opacity-50" // Added disabled style
+                      className="h-8 w-8 rounded-full border border-gray-300 dark:border-gray-700 disabled:opacity-50"
                       onClick={() => adjustGuest(type, -1)}
-
                       disabled={
                         (type === 'Adults' && guestCounts.Adults <= 1 && (guestCounts.Children > 0 || guestCounts.Infants > 0)) ||
                         (type !== 'Adults' && guestCounts[type] === 0)
                       }
                     >
-                      <span className="text-lg font-bold select-none">-</span>
+                      <span className="text-lg font-medium select-none">-</span>
                     </Button>
                     <span className="w-5 text-center font-medium text-sm select-none">
                       {guestCounts[type]}
@@ -267,9 +301,8 @@ export default function BookingForm({ className }: any) {
                       size="icon"
                       className="h-8 w-8 rounded-full border border-gray-300 dark:border-gray-700"
                       onClick={() => adjustGuest(type, 1)}
-
                     >
-                      <span className="text-lg font-bold select-none">+</span>
+                      <span className="text-lg font-medium select-none">+</span>
                     </Button>
                   </div>
                 </div>
@@ -284,16 +317,13 @@ export default function BookingForm({ className }: any) {
           </Popover>
         </div>
 
-
         <Separator orientation="horizontal" className="block md:hidden" />
-
 
         <div className="w-full md:w-auto md:flex-shrink-0">
           <Button
             aria-label="Search bookings"
             className={cn(
               "w-full md:w-14 h-16 bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center",
-
               "rounded-b-xl md:rounded-bl-none md:rounded-r-xl"
             )}
             onClick={handleBookNow}

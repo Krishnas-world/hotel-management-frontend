@@ -23,12 +23,6 @@ interface RoomCardProps {
 export const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
   return (
     <Card className="border-0 rounded-2xl shadow-lg overflow-hidden transition-all ease-in-out duration-300 hover:shadow-xl hover:-translate-y-1 p-0">
-      {/* Badge */}
-      <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10">
-        <div className="bg-amber-600 text-white text-xs py-1 px-2 sm:px-3 rounded-full">
-          {room.type}
-        </div>
-      </div>
 
       <Image
         src={room.image}

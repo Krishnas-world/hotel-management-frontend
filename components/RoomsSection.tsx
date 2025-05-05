@@ -49,7 +49,7 @@ export default function RoomsSection() {
       </div>
 
 
-      <div className="px-6 md:px-12 lg:px-24 sm:px-6 bg-gradient-to-b from-white to-gray-50 pt-16 pb-24" id="rooms">
+      <div className="px-6 md:px-12 lg:px-24 sm:px-6 bg-white pt-16 pb-24" id="rooms">
         <div className="max-w-7xl mx-auto">
 
           <div className="text-center mb-12 md:mb-16 relative">

@@ -1,8 +1,6 @@
-import HeroSection from "./HeroSection"
 import RoomsSection from "./RoomsSection"
 import AboutSection from "./AboutSection"
-import BookingForm from "./BookingForm"
-import { Footer } from "./Footer"
+import Footer  from "./Footer"
 import { Facilities } from "./Facilities"
 
 export default function LandingPage() {
