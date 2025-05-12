@@ -186,8 +186,7 @@ const Register: React.FC = () => {
         body: JSON.stringify({
           fullName: formData.username, // Assuming username is used as fullName in backend
           email: formData.email,
-          // Note: Your backend handleRegistration doesn't seem to use password.
-          // If it should, add: password: formData.password,
+          password: formData.password,
         }),
       });
 
@@ -348,7 +347,7 @@ const Register: React.FC = () => {
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-xs text-slate-500">Password strength:</p>
                     <p className={`text-xs font-medium ${passwordStrength.strength < 3 ? 'text-red-500' :
-                        passwordStrength.strength < 4 ? 'text-yellow-500' : 'text-green-500'
+                      passwordStrength.strength < 4 ? 'text-yellow-500' : 'text-green-500'
                       }`}>
                       {passwordStrength.text}
                     </p>
@@ -356,7 +355,7 @@ const Register: React.FC = () => {
                   <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${passwordStrength.strength < 3 ? 'bg-red-500' :
-                          passwordStrength.strength < 4 ? 'bg-yellow-500' : 'bg-green-500'
+                        passwordStrength.strength < 4 ? 'bg-yellow-500' : 'bg-green-500'
                         }`}
                       style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
                     ></div>

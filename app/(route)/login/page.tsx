@@ -177,8 +177,7 @@ const Login: React.FC = () => {
         // Send email and password in the request body
         body: JSON.stringify({
           email: formData.email,
-          // Note: Your backend handleLogin currently only uses email.
-          // If it requires password, add: password: formData.password,
+          password: formData.password,
         }),
       });
 
@@ -232,7 +231,7 @@ const Login: React.FC = () => {
     // Redirect the user's browser to your backend's Google OAuth initiation route.
     // This URL must match the route defined in your backend router (e.g., /api/v1/auth/google).
     // Replace 5000 with your backend's actual port if different.
-    window.location.href = 'http://localhost:5000/api/v1/auth/google';
+    window.location.href = 'http://localhost:5000/api/v1/user/auth/google';
   };
   // --- End of Google Login Handler ---
 
