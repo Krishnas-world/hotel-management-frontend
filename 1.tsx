@@ -1,5 +1,3 @@
-// app/register/page.tsx
-
 "use client"
 import React, { useState } from 'react';
 import { Mail, Lock, User, Loader2, EyeOff, Eye } from 'lucide-react';
@@ -9,7 +7,7 @@ import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useMediaQuery } from '@/app/hooks/useMediaQuery'; // Assuming this hook exists
+import { useMediaQuery } from '@/app/hooks/useMediaQuery';
 import Image from 'next/image';
 
 // Form input component with enhanced features
@@ -26,7 +24,7 @@ const FormInput = ({
   showPasswordToggle?: boolean;
 } & React.InputHTMLAttributes<HTMLInputElement>) => {
   const [showPassword, setShowPassword] = useState(false);
-
+  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -47,8 +45,9 @@ const FormInput = ({
           </div>
         )}
         <Input
-          className={`bg-white ${icon ? 'pl-10' : ''} ${error ? 'border-red-500 pr-10' : ''} ${showPasswordToggle ? 'pr-10' : ''
-            }`}
+          className={`bg-white ${icon ? 'pl-10' : ''} ${error ? 'border-red-500' : ''} ${
+            showPasswordToggle ? 'pr-10' : ''
+          }`}
           {...props}
           type={inputType}
         />
@@ -79,19 +78,19 @@ const useForm = (initialState: any) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev: any) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-
+    
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
-
+  
   return {
     formData,
     setFormData,
@@ -102,7 +101,6 @@ const useForm = (initialState: any) => {
     handleChange
   };
 };
-
 
 const Register: React.FC = () => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
@@ -160,7 +158,6 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // --- Modified handleSubmit function to use fetch API ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -182,19 +179,16 @@ const Register: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        // Send only necessary data for registration
         body: JSON.stringify({
-          fullName: formData.username, // Assuming username is used as fullName in backend
+          fullName: formData.username,
           email: formData.email,
-          // Note: Your backend handleRegistration doesn't seem to use password.
-          // If it should, add: password: formData.password,
+          password: formData.password, // Added password to be sent to backend
         }),
       });
 
-      const data = await response.json(); // Parse the JSON response from backend
+      const data = await response.json();
 
       if (response.ok) {
-        // Registration was successful
         console.log("Registration successful:", data.message);
         setFormStatus({
           type: 'success',
@@ -203,47 +197,30 @@ const Register: React.FC = () => {
 
         // Redirect to login page after a delay
         setTimeout(() => {
-          // In a real app, you would use router.push('/login') here
-          console.log('Redirecting to login page...');
-          // router.push('/login'); // Example using Next.js router
-          window.location.href = '/login'; // Simple browser redirect
+          window.location.href = '/login';
         }, 2000);
-
       } else {
-        // Registration failed (e.g., email already registered, validation error from backend)
         console.error("Registration failed:", data.message);
         setFormStatus({
           type: 'error',
           message: data.message || 'Registration failed. Please try again.',
         });
-        // If backend sends specific field errors, you could update 'errors' state here
-        // e.g., if (data.errors) setErrors(data.errors);
       }
-
     } catch (error) {
-      // Handle network errors or unexpected issues
       console.error("Network or unexpected error during registration:", error);
       setFormStatus({
         type: 'error',
         message: 'An error occurred during registration. Please try again.',
       });
     } finally {
-      setIsSubmitting(false); // Ensure button is re-enabled
+      setIsSubmitting(false);
     }
   };
-  // --- End of Modified handleSubmit function ---
 
-
-  // --- Google Login Handler (remains the same) ---
   const handleGoogleLogin = () => {
     console.log("Initiating Google OAuth login from frontend...");
-    // Redirect the user's browser to your backend's Google OAuth initiation route.
-    // This URL must match the route defined in your backend router (e.g., /api/v1/auth/google).
-    // Replace 5000 with your backend's actual port if different.
     window.location.href = 'http://localhost:5000/api/v1/user/auth/google';
   };
-  // --- End of Google Login Handler ---
-
 
   const getPasswordStrength = () => {
     const { password } = formData;
@@ -272,10 +249,11 @@ const Register: React.FC = () => {
       <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">
           {/* Logo */}
-          {/* Assuming /logo.svg exists in your public directory */}
           <div className="flex justify-center mb-6">
-            <div className="h-14 w-14 bg-transparent rounded-full flex items-center justify-center">
-              <Image src="/logo.svg" alt="Logo" height={30} width={30} className="h-8 w-8" />
+            <div className="h-14 w-14 bg-amber-500 rounded-full flex items-center justify-center">
+              <svg className="h-8 w-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
             </div>
           </div>
 
@@ -308,7 +286,7 @@ const Register: React.FC = () => {
               error={errors.username}
               required
               autoComplete="username"
-              disabled={isSubmitting} // Disable form fields while submitting
+              disabled={isSubmitting}
             />
 
             <FormInput
@@ -323,13 +301,13 @@ const Register: React.FC = () => {
               error={errors.email}
               required
               autoComplete="email"
-              disabled={isSubmitting} // Disable form fields while submitting
+              disabled={isSubmitting}
             />
 
             <div>
               <FormInput
                 label="Password"
-                type="password" // Keep type as password initially for browser features
+                type="password"
                 name="password"
                 id="password"
                 placeholder="••••••••"
@@ -339,25 +317,27 @@ const Register: React.FC = () => {
                 error={errors.password}
                 required
                 autoComplete="new-password"
-                disabled={isSubmitting} // Disable form fields while submitting
-                showPasswordToggle // Enable the show/hide password toggle
+                disabled={isSubmitting}
+                showPasswordToggle
               />
 
               {formData.password && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-xs text-slate-500">Password strength:</p>
-                    <p className={`text-xs font-medium ${passwordStrength.strength < 3 ? 'text-red-500' :
-                        passwordStrength.strength < 4 ? 'text-yellow-500' : 'text-green-500'
-                      }`}>
+                    <p className={`text-xs font-medium ${
+                      passwordStrength.strength < 3 ? 'text-red-500' :
+                      passwordStrength.strength < 4 ? 'text-yellow-500' : 'text-green-500'
+                    }`}>
                       {passwordStrength.text}
                     </p>
                   </div>
                   <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
                     <div
-                      className={`h-full ${passwordStrength.strength < 3 ? 'bg-red-500' :
-                          passwordStrength.strength < 4 ? 'bg-yellow-500' : 'bg-green-500'
-                        }`}
+                      className={`h-full ${
+                        passwordStrength.strength < 3 ? 'bg-red-500' :
+                        passwordStrength.strength < 4 ? 'bg-yellow-500' : 'text-green-500'
+                      }`}
                       style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
                     ></div>
                   </div>
@@ -373,14 +353,18 @@ const Register: React.FC = () => {
                   checked={formData.terms}
                   onCheckedChange={(checked) => {
                     handleChange({
-                      target: { name: 'terms', value: '', type: 'checkbox', checked: !!checked }
+                      target: {
+                        name: 'terms',
+                        type: 'checkbox',
+                        checked: !!checked,
+                      },
                     } as React.ChangeEvent<HTMLInputElement>);
                   }}
                   disabled={isSubmitting}
                 />
               </div>
-              <div className="ml-3">
-                <label htmlFor="terms" className="text-sm text-slate-700">
+              <div className="ml-3 text-sm text-slate-700">
+                <Label htmlFor="terms">
                   By continuing, you agree to Mancing{' '}
                   <Link href="/terms" className="text-blue-600 hover:text-blue-800 underline">
                     Terms of Service
@@ -389,7 +373,7 @@ const Register: React.FC = () => {
                   <Link href="/privacy" className="text-blue-600 hover:text-blue-800 underline">
                     Privacy Policy
                   </Link>.
-                </label>
+                </Label>
                 {errors.terms && <p className="text-xs text-red-500 mt-1">{errors.terms}</p>}
               </div>
             </div>
@@ -398,7 +382,7 @@ const Register: React.FC = () => {
               type="submit"
               className="w-full bg-amber-400 hover:bg-amber-500 text-slate-800 font-medium"
               size="lg"
-              disabled={isSubmitting} // Disable the button while submitting
+              disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
@@ -416,27 +400,27 @@ const Register: React.FC = () => {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-slate-50 text-slate-500">
-                  or
+                  or continue with
                 </span>
               </div>
             </div>
 
-            {/* Social Login Buttons */}
-            <div className="w-full">
+            {/* Social Login Button */}
+            <div className="flex justify-center">
               <Button
                 variant="outline"
                 type="button"
-                className="flex items-center justify-center bg-white text-black py-2 w-full rounded-md border hover:bg-gray-100"
+                className="flex items-center justify-center bg-white py-2 px-4 w-full max-w-xs"
                 disabled={isSubmitting}
                 onClick={handleGoogleLogin}
               >
                 <svg viewBox="0 0 24 24" className="w-5 h-5 mr-2" aria-hidden="true">
-                  <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
-                  <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
-                  <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
-                  <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26540 14.29L1.27539 17.385C3.25539 21.31 7.31040 24.0001 12.0004 24.0001Z" fill="#34A853" />
+                  <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335"/>
+                  <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4"/>
+                  <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05"/>
+                  <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26540 14.29L1.27539 17.385C3.25539 21.31 7.31040 24.0001 12.0004 24.0001Z" fill="#34A853"/>
                 </svg>
-                Continue with Google
+                Google
               </Button>
             </div>
 
@@ -453,9 +437,7 @@ const Register: React.FC = () => {
       </div>
 
       {/* Right side - Illustration */}
-      {/* ... (existing image div) */}
       <div className="hidden md:block md:w-1/2 bg-blue-400 relative overflow-hidden">
-
         {/* Illustration/Image */}
         <div className="absolute inset-0 bg-cover bg-center" style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
