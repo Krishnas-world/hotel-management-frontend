@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Menu, User } from "lucide-react"
+import Cookies from 'js-cookie' // Add this import for cross-browser cookie handling
 
 import { Button } from "@/components/ui/button"
 import {
@@ -42,12 +43,17 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  interface User {
+    name: string;
+    email: string;
+  }
+
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Function to decode JWT token
-    const parseJwt = (token: string): any => {
+    const parseJwt = (token:any) => {
       try {
         // Split the token and get the payload part (second part)
         const base64Url = token.split('.')[1];
@@ -65,53 +71,63 @@ export default function Navbar() {
       }
     };
 
-    // Function to get cookie by name
-    const getCookie = (name: string): string | null => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-      return null;
+    // Check for auth token in cookies using multiple methods
+    const checkAuthToken = () => {
+      // Method 1: Use js-cookie
+      const cookieToken = Cookies.get('authToken');
+      
+      // Method 2: Use document.cookie
+      const documentCookieToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('authToken='))
+        ?.split('=')[1];
+
+      // Prioritize js-cookie method
+      const token = cookieToken || documentCookieToken;
+      
+      console.log("Token found:", !!token);
+      console.log("Full cookie string:", document.cookie);
+
+      if (token) {
+        try {
+          // Parse the JWT token to get user info
+          const decodedToken = parseJwt(token);
+          if (decodedToken && decodedToken.email) {
+            console.log("Decoded token:", decodedToken);
+            setUser({
+              name: decodedToken.email.split('@')[0], // Use part before @ as display name
+              email: decodedToken.email
+            });
+          }
+        } catch (error) {
+          console.error("Error processing auth token:", error);
+          setUser(null);
+        }
+      }
+      
+      setLoading(false);
     };
 
-    // Check for auth token in cookies
-    const token = getCookie('authToken');
-    
-    if (token) {
-      try {
-        // Parse the JWT token to get user info
-        const decodedToken = parseJwt(token);
-        if (decodedToken && decodedToken.email) {
-          setUser({
-            name: decodedToken.email.split('@')[0] || "", // Use part before @ as display name
-            email: decodedToken.email
-          });
-        }
-      } catch (error) {
-        console.error("Error processing auth token:", error);
-        setUser(null);
-      }
-    }
-    
-    setLoading(false);
+    // Call the function to check auth token
+    checkAuthToken();
   }, []);
 
   // Get first character of user's name for avatar
-  const userInitial = user?.name?.charAt(0)?.toUpperCase() || "U";
+  const userInitial = user?.name?.charAt(0)?.toUpperCase() || "U"
 
   // Handle logout
   const handleLogout = async () => {
     try {
       // Get the clientDeviceId from the JWT token
-      const getCookie = (name: string): string | null => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-        return null;
+      const getToken = () => {
+        return Cookies.get('authToken') || 
+               document.cookie
+                 .split('; ')
+                 .find(row => row.startsWith('authToken='))
+                 ?.split('=')[1];
       };
       
-      const token = getCookie('authToken');
-      console.log("Token:", token);
-      const parseJwt = (token: string): any => {
+      const parseJwt = (token:any) => {
         try {
           const base64Url = token.split('.')[1];
           const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -128,6 +144,7 @@ export default function Navbar() {
         }
       };
       
+      const token = getToken();
       let clientDeviceId = null;
       if (token) {
         const decodedToken = parseJwt(token);
@@ -137,6 +154,7 @@ export default function Navbar() {
       // Call the logout API endpoint
       const response = await fetch('http://localhost:5000/api/v1/user/logout', {
         method: 'POST',
+        credentials: 'include', // This is important for cookies
         headers: {
           'Content-Type': 'application/json',
         },
@@ -144,7 +162,8 @@ export default function Navbar() {
       });
 
       if (response.ok) {
-        // Clear user state and redirect to home page
+        // Clear user state and cookies
+        Cookies.remove('authToken');
         setUser(null);
         window.location.href = '/';
       } else {
@@ -196,14 +215,14 @@ export default function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer ml-4 border border-amber-500">
-                  <AvatarImage src="" alt={user?.name || "User"} />
+                  <AvatarImage src="" alt={user.name} />
                   <AvatarFallback className="bg-amber-600 text-white font-semibold">
                     {userInitial}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 mt-2">
-                <div className="px-2 py-1.5 text-sm font-medium">{user?.email || "Unknown"}</div>
+                <div className="px-2 py-1.5 text-sm font-medium">{user.email}</div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard">Dashboard</Link>
@@ -265,7 +284,7 @@ export default function Navbar() {
                         {userInitial}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-gray-300">{user?.email || "Unknown"}</span>
+                    <span className="text-sm text-gray-300">{user.email}</span>
                   </div>
                   <Link href="/dashboard" onClick={() => setOpen(false)} className="text-white hover:text-amber-400">Dashboard</Link>
                   <Link href="/bookings" onClick={() => setOpen(false)} className="text-white hover:text-amber-400">My Bookings</Link>

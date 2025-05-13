@@ -188,6 +188,7 @@ const Register: React.FC = () => {
           email: formData.email,
           password: formData.password,
         }),
+        credentials: 'include', 
       });
 
       const data = await response.json(); // Parse the JSON response from backend

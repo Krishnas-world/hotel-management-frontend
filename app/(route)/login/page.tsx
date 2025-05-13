@@ -179,6 +179,7 @@ const Login: React.FC = () => {
           email: formData.email,
           password: formData.password,
         }),
+        credentials: 'include',
       });
 
       // Check if the response status is OK (200-299)
