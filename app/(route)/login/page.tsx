@@ -9,10 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useMediaQuery } from '@/app/hooks/useMediaQuery'; // Assuming this hook exists
 import Image from 'next/image';
-
-// Form input component with enhanced features (assuming this is defined elsewhere or inline)
-// If FormInput is not defined in this file, ensure it's imported or included.
-// Example minimal definition if needed:
+import { toast } from 'sonner';
 
 const FormInput = ({
   label,
@@ -74,10 +71,6 @@ const FormInput = ({
     </div>
   );
 };
-
-
-// Custom hook for form validation (assuming this is defined elsewhere or inline)
-// Example minimal definition if needed:
 
 const useForm = (initialState: any) => {
   const [formData, setFormData] = useState(initialState);
@@ -196,10 +189,9 @@ const Login: React.FC = () => {
         // Redirect to the dashboard after a delay
         setTimeout(() => {
           console.log('Redirecting to dashboard...');
-          // Use Next.js router if available, otherwise simple window redirect
-          // router.push('/dashboard'); // Example using Next.js router
-          window.location.href = '/dashboard'; // Simple browser redirect
-        }, 1500); // Shorter delay for login redirect
+          toast.success('Login successful! Redirecting to dashboard...');
+          window.location.href = '/dashboard'; 
+        }, 1500);
 
       } else {
         // Login failed (e.g., invalid credentials, user not found)
