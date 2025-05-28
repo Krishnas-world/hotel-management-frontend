@@ -22,143 +22,188 @@ import {
   Mountain,
   Filter,
   SlidersHorizontal,
-  X
+  X,
+  Loader2
 } from "lucide-react";
 import BookingForm from "@/components/BookingForm";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 
-// Sample room data
-const roomsData = [
-  {
-    id: "deluxe-suite",
-    name: "Deluxe Suite",
-    type: "Premium Room",
-    image: "/images/rooms/deluxe-suite.jpg",
-    beds: "1 King Bed",
-    capacity: "2 Adults",
-    size: "32 sq.m",
-    amenities: "Breakfast Included",
-    price: 12500,
-    view: "Ocean",
-    features: ["Breakfast", "WiFi", "Pool Access", "Ocean View", "Balcony"],
-    availability: true
-  },
-  {
-    id: "premium-king",
-    name: "Premium King Room",
-    type: "Luxury Room",
-    image: "/images/rooms/premium-king.jpg",
-    beds: "1 King Bed",
-    capacity: "2 Adults",
-    size: "28 sq.m",
-    amenities: "WiFi + Breakfast",
-    price: 9800,
-    view: "Garden",
-    features: ["Breakfast", "WiFi", "Garden View", "Balcony"],
-    availability: true
-  },
-  {
-    id: "family-suite",
-    name: "Family Suite",
-    type: "Suite",
-    image: "/images/rooms/family-suite.jpg",
-    beds: "1 King + 2 Single",
-    capacity: "4 Adults",
-    size: "45 sq.m",
-    amenities: "All Inclusive",
-    price: 18500,
-    view: "Ocean",
-    features: ["All Meals", "WiFi", "Pool Access", "Ocean View", "Balcony", "Family Area"],
-    availability: true
-  },
-  {
-    id: "standard-twin",
-    name: "Standard Twin Room",
-    type: "Classic Room",
-    image: "/images/rooms/standard-twin.jpg",
-    beds: "2 Double Beds",
-    capacity: "2 Adults",
-    size: "24 sq.m",
-    amenities: "WiFi Included",
-    price: 7500,
-    view: "City",
-    features: ["WiFi", "City View"],
-    availability: true
-  },
-  {
-    id: "honeymoon-suite",
-    name: "Honeymoon Suite",
-    type: "Premium Suite",
-    image: "/images/rooms/honeymoon-suite.jpg",
-    beds: "1 King Bed",
-    capacity: "2 Adults",
-    size: "38 sq.m",
-    amenities: "Spa + Breakfast",
-    price: 16500,
-    view: "Ocean",
-    features: ["Breakfast", "WiFi", "Pool Access", "Private Spa", "Ocean View", "Private Balcony"],
-    availability: true
-  },
-  {
-    id: "executive-suite",
-    name: "Executive Suite",
-    type: "Business Class",
-    image: "/images/rooms/executive-suite.jpg",
-    beds: "1 King Bed",
-    capacity: "2 Adults",
-    size: "40 sq.m",
-    amenities: "Business Services",
-    price: 15000,
-    view: "City",
-    features: ["Breakfast", "WiFi", "Business Center Access", "Meeting Room", "City View"],
-    availability: true
-  }
-];
+// Types
+interface BackendRoom {
+  id: string;
+  roomName: string;
+  roomType: string;
+  beds: string;
+  price: number;
+  additionalBedCost?: number;
+  amenities: string | string[]; // Can be a JSON string or an array
+  roomSize: string;
+  photos?: string[]; // Changed to an array of strings
+  capacity?: string;
+  view?: string;
+  availability?: boolean;
+}
 
-const roomTypes = [
+interface TransformedRoom {
+  id: string;
+  name: string;
+  type: string;
+  image: string; // Now a single string URL
+  beds: string;
+  capacity: string;
+  size: string;
+  amenities: string;
+  price: number;
+  additionalBedCost: number;
+  view: string;
+  features: string[];
+  availability: boolean;
+}
+
+interface RoomType {
+  label: string;
+  value: string;
+}
+
+interface Filters {
+  breakfast: boolean;
+  wifi: boolean;
+  oceanView: boolean;
+  balcony: boolean;
+  spa: boolean;
+  pool: boolean;
+}
+
+// Room type mappings to match your backend
+const roomTypes: RoomType[] = [
   { label: "All Rooms", value: "all" },
   { label: "Suites", value: "Suite" },
   { label: "Premium", value: "Premium" },
   { label: "Luxury", value: "Luxury" },
   { label: "Classic", value: "Classic" },
-  { label: "Business", value: "Business" }
+  { label: "Standard", value: "Standard" },
+  { label: "Deluxe", value: "Deluxe" }
 ];
 
-const RoomsPage = () => {
-  const [activeView, setActiveView] = useState("grid");
-  const [priceRange, setPriceRange] = useState([5000, 20000]);
-  const [activeRoomType, setActiveRoomType] = useState("all");
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [filters, setFilters] = useState({
+const RoomsPage: React.FC = () => {
+  const [activeView, setActiveView] = useState<"grid" | "list">("grid");
+  const [priceRange, setPriceRange] = useState<number[]>([5000, 50000]);
+  const [activeRoomType, setActiveRoomType] = useState<string>("all");
+  const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
+  const [filters, setFilters] = useState<Filters>({
     breakfast: false,
     wifi: false,
     oceanView: false,
     balcony: false,
-    spa: false
+    spa: false,
+    pool: false
   });
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredRooms, setFilteredRooms] = useState(roomsData);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [rooms, setRooms] = useState<TransformedRoom[]>([]);
+  const [filteredRooms, setFilteredRooms] = useState<TransformedRoom[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRooms = async (): Promise<void> => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/v1/rooms/room', {
+          method: 'GET',
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch rooms');
+        }
+
+        const roomsData: BackendRoom[] = await response.json();
+        console.log(roomsData);
+        // Transform the data to match frontend expectations
+        const transformedRooms: TransformedRoom[] = roomsData.map((room: BackendRoom) => {
+          let parsedAmenities: string[] = [];
+          if (typeof room.amenities === 'string') {
+            try {
+              // Attempt to parse if it's a JSON string
+              parsedAmenities = JSON.parse(room.amenities);
+              // Ensure it's an array of strings after parsing
+              if (!Array.isArray(parsedAmenities)) {
+                parsedAmenities = [room.amenities]; // Fallback if parsed but not an array
+              }
+            } catch (e) {
+              // If parsing fails, treat as a comma-separated string
+              parsedAmenities = room.amenities.split(",").map((a: string) => a.trim());
+            }
+          } else if (Array.isArray(room.amenities)) {
+            parsedAmenities = room.amenities;
+          }
+
+          const defaultImage = "https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80";
+
+          return {
+            id: room.id,
+            name: room.roomName,
+            type: room.roomType,
+            image: room.photos && room.photos.length > 0 ? room.photos[0] : defaultImage, // Use first photo or default
+            beds: room.beds,
+            capacity: room.capacity || "2 Adults", // Default if not provided
+            size: room.roomSize || "N/A",
+            amenities: parsedAmenities.join(", "), // Join for display in amenities string
+            price: room.price,
+            additionalBedCost: parseFloat(room.additionalBedCost?.toString() || "0"), // Ensure it's a number
+            view: room.view || "Standard", // Default view
+            features: parsedAmenities, // Use the parsed array for filtering
+            availability: room.availability !== false // Default to available
+          };
+        });
+
+
+        setRooms(transformedRooms);
+        setFilteredRooms(transformedRooms);
+
+        // Update price range based on actual room prices
+        if (transformedRooms.length > 0) {
+          const prices = transformedRooms.map((room: TransformedRoom) => room.price);
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          setPriceRange([Math.floor(minPrice / 1000) * 1000, Math.ceil(maxPrice / 1000) * 1000]);
+        }
+
+      } catch (err) {
+        console.error('Error fetching rooms:', err);
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
 
   // Apply filters
   useEffect(() => {
-    let results = roomsData.filter(room => {
+    if (rooms.length === 0) return;
+
+    let results = rooms.filter((room: TransformedRoom) => {
       // Price filter
       if (room.price < priceRange[0] || room.price > priceRange[1]) return false;
 
       // Room type filter
-      if (activeRoomType !== "all" && !room.type.includes(activeRoomType)) return false;
+      if (activeRoomType !== "all" && !room.type.toLowerCase().includes(activeRoomType.toLowerCase())) return false;
 
       // Amenities filters
-      if (filters.breakfast && !room.features.includes("Breakfast")) return false;
-      if (filters.wifi && !room.features.includes("WiFi")) return false;
-      if (filters.oceanView && !room.features.includes("Ocean View")) return false;
-      if (filters.balcony && !room.features.includes("Balcony")) return false;
-      if (filters.spa && !room.features.includes("Private Spa")) return false;
+      const features = room.features.map((f: string) => f.toLowerCase());
+      if (filters.breakfast && !features.some((f: string) => f.includes("breakfast") || f.includes("meal"))) return false;
+      if (filters.wifi && !features.some((f: string) => f.includes("wifi") || f.includes("internet"))) return false;
+      if (filters.oceanView && !features.some((f: string) => f.includes("ocean") || f.includes("sea") || f.includes("view"))) return false;
+      if (filters.balcony && !features.some((f: string) => f.includes("balcony") || f.includes("terrace"))) return false;
+      if (filters.spa && !features.some((f: string) => f.includes("spa") || f.includes("wellness"))) return false;
+      if (filters.pool && !features.some((f: string) => f.includes("pool") || f.includes("swimming"))) return false;
 
       // Search query
-      if (searchQuery && !room.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !room.type.toLowerCase().includes(searchQuery.toLowerCase())) {
+      if (searchQuery &&
+        !room.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !room.type.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !room.amenities.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
 
@@ -166,35 +211,80 @@ const RoomsPage = () => {
     });
 
     setFilteredRooms(results);
-  }, [priceRange, activeRoomType, filters, searchQuery]);
+  }, [priceRange, activeRoomType, filters, searchQuery, rooms]);
 
-  const handleCheckboxChange = (filter: keyof typeof filters) => {
+  const handleCheckboxChange = (filter: keyof Filters): void => {
     setFilters(prev => ({
       ...prev,
       [filter]: !prev[filter]
     }));
   };
 
-  const clearFilters = () => {
-    setPriceRange([5000, 20000]);
+  const clearFilters = (): void => {
+    if (rooms.length > 0) {
+      const prices = rooms.map((room: TransformedRoom) => room.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      setPriceRange([Math.floor(minPrice / 1000) * 1000, Math.ceil(maxPrice / 1000) * 1000]);
+    }
     setActiveRoomType("all");
     setFilters({
       breakfast: false,
       wifi: false,
       oceanView: false,
       balcony: false,
-      spa: false
+      spa: false,
+      pool: false
     });
     setSearchQuery("");
   };
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(price);
   };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>): void => {
+    const target = e.target as HTMLImageElement;
+    target.src = "https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80";
+  };
+
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-amber-600" />
+            <p className="text-gray-600">Loading rooms...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center bg-white p-8 rounded-lg shadow-md">
+            <p className="text-red-600 mb-4">Error loading rooms: {error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Navbar />
@@ -223,13 +313,13 @@ const RoomsPage = () => {
             </p>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                Ocean Views
+                Premium Comfort
               </Badge>
               <Badge variant="outline" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                Premium Amenities
+                Modern Amenities
               </Badge>
               <Badge variant="outline" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                Luxury Experience
+                Exceptional Service
               </Badge>
             </div>
           </div>
@@ -302,9 +392,9 @@ const RoomsPage = () => {
                 <Label className="text-sm font-medium mb-1 block">Price Range</Label>
                 <div className="px-2">
                   <Slider
-                    defaultValue={[5000, 20000]}
-                    min={5000}
-                    max={20000}
+                    defaultValue={priceRange}
+                    min={rooms.length > 0 ? Math.min(...rooms.map((r: TransformedRoom) => r.price)) : 5000}
+                    max={rooms.length > 0 ? Math.max(...rooms.map((r: TransformedRoom) => r.price)) : 50000}
                     step={500}
                     value={priceRange}
                     onValueChange={setPriceRange}
@@ -321,7 +411,7 @@ const RoomsPage = () => {
               <div>
                 <Label className="text-sm font-medium mb-3 block">Room Type</Label>
                 <div className="space-y-1">
-                  {roomTypes.map((type) => (
+                  {roomTypes.map((type: RoomType) => (
                     <Button
                       key={type.value}
                       variant={activeRoomType === type.value ? "default" : "outline"}
@@ -350,7 +440,7 @@ const RoomsPage = () => {
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
                     >
                       <Utensils className="h-4 w-4 mr-2 text-amber-500" />
-                      Breakfast Included
+                      Meals/Breakfast
                     </label>
                   </div>
 
@@ -365,7 +455,7 @@ const RoomsPage = () => {
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
                     >
                       <Wifi className="h-4 w-4 mr-2 text-amber-500" />
-                      Free WiFi
+                      WiFi
                     </label>
                   </div>
 
@@ -380,7 +470,7 @@ const RoomsPage = () => {
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
                     >
                       <Mountain className="h-4 w-4 mr-2 text-amber-500" />
-                      Ocean View
+                      Premium View
                     </label>
                   </div>
 
@@ -410,7 +500,22 @@ const RoomsPage = () => {
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
                     >
                       <Bath className="h-4 w-4 mr-2 text-amber-500" />
-                      Spa Access
+                      Spa/Wellness
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="pool"
+                      checked={filters.pool}
+                      onCheckedChange={() => handleCheckboxChange('pool')}
+                    />
+                    <label
+                      htmlFor="pool"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
+                    >
+                      <Mountain className="h-4 w-4 mr-2 text-amber-500" />
+                      Pool Access
                     </label>
                   </div>
                 </div>
@@ -426,7 +531,7 @@ const RoomsPage = () => {
                     {filteredRooms.length} {filteredRooms.length === 1 ? 'Room' : 'Rooms'} Available
                   </h2>
                   <p className="text-sm text-gray-500">
-                    for your selected dates
+                    Choose from our selection of comfortable accommodations
                   </p>
                 </div>
 
@@ -453,30 +558,8 @@ const RoomsPage = () => {
                 </div>
               </div>
 
-              {/* Featured Room Banner */}
-              {filteredRooms.length > 0 && (
-                <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-4 sm:p-6 rounded-xl mb-8 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 h-full w-1/3 lg:w-1/2">
-                    <div
-                      className="h-full bg-cover bg-center rounded-r-xl"
-                      style={{ backgroundImage: "url('/images/rooms/featured-room.jpg')" }}
-                    />
-                  </div>
-                  <div className="relative z-10 max-w-md">
-                    <Badge className="bg-amber-600 hover:bg-amber-600 mb-2">Featured Offer</Badge>
-                    <h3 className="text-xl sm:text-2xl font-serif mb-2">10% Off on Our Premium Suites</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Book any of our premium suites for a minimum of 3 nights and get 10% off on your entire stay.
-                    </p>
-                    <Button className="bg-amber-600 hover:bg-amber-700">
-                      Book Now
-                    </Button>
-                  </div>
-                </div>
-              )}
-
               {/* No Results Message */}
-              {filteredRooms.length === 0 && (
+              {filteredRooms.length === 0 && !loading && (
                 <div className="bg-amber-50 p-8 rounded-lg text-center">
                   <Bed className="h-12 w-12 text-amber-300 mx-auto mb-3" />
                   <h3 className="text-xl font-medium mb-2">No rooms match your criteria</h3>
@@ -496,7 +579,7 @@ const RoomsPage = () => {
                 <TabsContent value="all" className="mt-0">
                   {activeView === 'grid' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {filteredRooms.map(room => (
+                      {filteredRooms.map((room: TransformedRoom) => (
                         <div key={room.id} className="relative">
                           <RoomCard room={room} />
                           <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md text-amber-600 font-medium text-sm">
@@ -508,13 +591,14 @@ const RoomsPage = () => {
                     </div>
                   ) : (
                     <div className="space-y-6">
-                      {filteredRooms.map(room => (
+                      {filteredRooms.map((room: TransformedRoom) => (
                         <div key={room.id} className="flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-md">
                           <div className="md:w-1/3 relative">
                             <img
                               src={room.image}
                               alt={room.name}
                               className="w-full h-48 md:h-full object-cover"
+                              onError={handleImageError}
                             />
                             <div className="absolute top-4 left-4">
                               <Badge className="bg-amber-600 hover:bg-amber-600">{room.type}</Badge>
@@ -524,21 +608,24 @@ const RoomsPage = () => {
                             <div className="mb-4">
                               <h3 className="text-xl font-serif mb-2">{room.name}</h3>
                               <div className="flex flex-wrap gap-3 mb-2">
-                                {room.features.map((feature, index) => (
+                                {room.features.slice(0, 4).map((feature: string, index: number) => (
                                   <span key={index} className="flex items-center text-sm text-gray-600">
                                     <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mr-1.5"></span>
                                     {feature}
                                   </span>
                                 ))}
+                                {room.features.length > 4 && (
+                                  <span className="text-sm text-gray-500">+{room.features.length - 4} more</span>
+                                )}
                               </div>
                             </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm mb-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm mb-6">
                               <div>
                                 <span className="text-gray-500 flex items-center">
                                   <Bed className="h-4 w-4 mr-1 text-amber-500" />
                                   Beds
                                 </span>
-                                <span className="font-medium">{room.beds}</span>
+                                <span className="font-medium">{room.beds || 'Standard'}</span>
                               </div>
                               <div>
                                 <span className="text-gray-500 flex items-center">
@@ -549,23 +636,21 @@ const RoomsPage = () => {
                               </div>
                               <div>
                                 <span className="text-gray-500 flex items-center">
-                                  <Mountain className="h-4 w-4 mr-1 text-amber-500" />
-                                  View
-                                </span>
-                                <span className="font-medium">{room.view}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-500 flex items-center">
                                   <Coffee className="h-4 w-4 mr-1 text-amber-500" />
-                                  Amenities
+                                  Size
                                 </span>
-                                <span className="font-medium">{room.amenities}</span>
+                                <span className="font-medium">{room.size}</span>
                               </div>
                             </div>
                             <div className="mt-auto flex justify-between items-center">
                               <div>
                                 <span className="text-2xl font-medium text-amber-600">{formatPrice(room.price)}</span>
                                 <span className="text-sm text-gray-500">/night</span>
+                                {room.additionalBedCost > 0 && (
+                                  <div className="text-xs text-gray-500">
+                                    +{formatPrice(room.additionalBedCost)} per extra bed
+                                  </div>
+                                )}
                               </div>
                               <Button className="bg-amber-600 hover:bg-amber-700">
                                 Book Now
@@ -576,39 +661,6 @@ const RoomsPage = () => {
                       ))}
                     </div>
                   )}
-                </TabsContent>
-
-                <TabsContent value="suites" className="mt-0">
-                  <div className={activeView === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-6"}>
-                    {filteredRooms
-                      .filter(room => room.type.includes('Suite'))
-                      .map(room => (
-                        <RoomCard key={room.id} room={room} />
-                      ))
-                    }
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="premium" className="mt-0">
-                  <div className={activeView === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-6"}>
-                    {filteredRooms
-                      .filter(room => room.type.includes('Premium'))
-                      .map(room => (
-                        <RoomCard key={room.id} room={room} />
-                      ))
-                    }
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="standard" className="mt-0">
-                  <div className={activeView === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-6"}>
-                    {filteredRooms
-                      .filter(room => room.type.includes('Classic'))
-                      .map(room => (
-                        <RoomCard key={room.id} room={room} />
-                      ))
-                    }
-                  </div>
                 </TabsContent>
               </Tabs>
             </div>
