@@ -123,9 +123,7 @@ const RoomsPage: React.FC = () => {
           let parsedAmenities: string[] = [];
           if (typeof room.amenities === 'string') {
             try {
-              // Attempt to parse if it's a JSON string
               parsedAmenities = JSON.parse(room.amenities);
-              // Ensure it's an array of strings after parsing
               if (!Array.isArray(parsedAmenities)) {
                 parsedAmenities = [room.amenities]; // Fallback if parsed but not an array
               }
