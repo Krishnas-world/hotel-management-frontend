@@ -109,7 +109,7 @@ const RoomsPage: React.FC = () => {
     const fetchRooms = async (): Promise<void> => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/v1/rooms/room', {
+        const response = await fetch('http://localhost:5000/api/v1/rooms', {
           method: 'GET',
         });
         if (!response.ok) {
