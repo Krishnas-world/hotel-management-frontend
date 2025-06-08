@@ -254,12 +254,12 @@ const RoomsPage: React.FC = () => {
     return (
       <div>
         <Navbar />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-amber-600" />
-            <p className="text-gray-600">Loading rooms...</p>
-          </div>
-        </div>
+            <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mx-auto mb-4"></div>
+                    <p className="text-gray-600 text-lg">Loading room details...</p>
+                </div>
+            </div>
       </div>
     );
   }
@@ -286,7 +286,7 @@ const RoomsPage: React.FC = () => {
   return (
     <div>
       <Navbar />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
         {/* Hero Banner */}
         <div className="relative h-64 md:h-80 overflow-hidden">
           {/* Room image behind gradient */}

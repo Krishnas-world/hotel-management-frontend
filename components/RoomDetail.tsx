@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { toast } from 'sonner';
 import BookingForm from './BookingForm';
+import Navbar from './Navbar';
 
 interface Room {
     id: string;
@@ -290,12 +291,15 @@ export default function RoomDetails({ params }: RoomDetailPageProps) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mx-auto mb-4"></div>
-                    <p className="text-gray-600 text-lg">Loading room details...</p>
+            <div>
+                <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mx-auto mb-4"></div>
+                        <p className="text-gray-600 text-lg">Loading room details...</p>
+                    </div>
                 </div>
             </div>
+
         );
     }
 
@@ -318,44 +322,44 @@ export default function RoomDetails({ params }: RoomDetailPageProps) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
             {/* Enhanced Header */}
-<div className="bg-white/80 backdrop-blur-lg border-b border-orange-100  top-0 z-40 shadow-sm">
-    <div className="container mx-auto px-4 py-4 lg:py-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-0">
-            <div className="flex items-center space-x-4">
-                <button onClick={() => window.history.back()}
-                        className="p-2 hover:bg-orange-100 rounded-full transition-colors">
-                    <ChevronLeft size={24} className="text-gray-700" />
-                </button>
-                <div>
-                    <nav className="text-xs sm:text-sm text-gray-500 mb-1">
-                        <span className="text-orange-600 font-medium">Home</span> / 
-                        <span className="text-orange-600 font-medium"> Rooms</span> / 
-                        <span className="text-gray-700"> {room.roomName}</span>
-                    </nav>
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                        {room.roomName}
-                    </h1>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 gap-2 sm:gap-0">
-                        <div className="flex items-center">
-                            <Star size={16} className="text-orange-400 fill-current mr-1" />
-                            <span className="font-semibold text-gray-800 text-sm sm:text-base">4.8</span>
-                            <span className="text-gray-500 ml-1 text-sm sm:text-base">(247 reviews)</span>
+            <div className="bg-white/80 backdrop-blur-lg border-b border-orange-100  top-0 z-40 shadow-sm">
+                <div className="container mx-auto px-4 py-4 lg:py-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-0">
+                        <div className="flex items-center space-x-4">
+                            <button onClick={() => window.history.back()}
+                                className="p-2 hover:bg-orange-100 rounded-full transition-colors">
+                                <ChevronLeft size={24} className="text-gray-700" />
+                            </button>
+                            <div>
+                                <nav className="text-xs sm:text-sm text-gray-500 mb-1">
+                                    <span className="text-orange-600 font-medium">Home</span> /
+                                    <span className="text-orange-600 font-medium"> Rooms</span> /
+                                    <span className="text-gray-700"> {room.roomName}</span>
+                                </nav>
+                                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                    {room.roomName}
+                                </h1>
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 gap-2 sm:gap-0">
+                                    <div className="flex items-center">
+                                        <Star size={16} className="text-orange-400 fill-current mr-1" />
+                                        <span className="font-semibold text-gray-800 text-sm sm:text-base">4.8</span>
+                                        <span className="text-gray-500 ml-1 text-sm sm:text-base">(247 reviews)</span>
+                                    </div>
+                                    <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                                        <MapPin size={14} className="text-orange-600 mr-1" />
+                                        <span>Premium Location</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                            <MapPin size={14} className="text-orange-600 mr-1" />
-                            <span>Premium Location</span>
+                        <div className="flex items-center justify-center lg:justify-end w-full lg:w-auto">
+                            <div className="w-full max-w-md lg:max-w-none">
+                                <BookingForm />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="flex items-center justify-center lg:justify-end w-full lg:w-auto">
-                <div className="w-full max-w-md lg:max-w-none">
-                    <BookingForm />
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
             <div className="container mx-auto px-4 py-8">
                 {/* Image Gallery */}

@@ -12,41 +12,68 @@ import { Calendar } from "@/components/ui/calendar";
 import { format, differenceInDays, isBefore } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
-import { useRouter } from 'next/navigation'; // Import useRouter for navigation
+import { useRouter } from 'next/navigation';
+
+interface BookingData {
+  dateRange?: DateRange;
+  rooms: string;
+  guests: string;
+  guestCounts: {
+    Adults: number;
+    Children: number;
+    Infants: number;
+  };
+}
 
 export default function BookingForm({ className }: any) {
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    // Initialize from local storage or set undefined
+  // Helper functions for session storage
+  const getBookingData = (): BookingData => {
     if (typeof window !== 'undefined') {
-      const storedDateRange = localStorage.getItem('dateRange');
-      if (storedDateRange) {
-        const parsed = JSON.parse(storedDateRange);
+      const storedData = sessionStorage.getItem('bookingData');
+      if (storedData) {
+        const parsed = JSON.parse(storedData);
         return {
-          from: parsed.from ? new Date(parsed.from) : undefined,
-          to: parsed.to ? new Date(parsed.to) : undefined,
+          ...parsed,
+          dateRange: parsed.dateRange ? {
+            from: parsed.dateRange.from ? new Date(parsed.dateRange.from) : undefined,
+            to: parsed.dateRange.to ? new Date(parsed.dateRange.to) : undefined,
+          } : undefined
         };
       }
     }
-    return undefined;
-  });
+    return {
+      dateRange: undefined,
+      rooms: "",
+      guests: "",
+      guestCounts: {
+        Adults: 2,
+        Children: 0,
+        Infants: 0,
+      }
+    };
+  };
 
-  const [rooms, setRooms] = useState<string>(() => {
-    // Initialize from local storage or set empty string
+  const saveBookingData = (data: BookingData) => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('rooms') || "";
+      const dataToStore = {
+        ...data,
+        dateRange: data.dateRange ? {
+          from: data.dateRange.from?.toISOString(),
+          to: data.dateRange.to?.toISOString(),
+        } : undefined
+      };
+      sessionStorage.setItem('bookingData', JSON.stringify(dataToStore));
     }
-    return "";
-  });
+  };
 
-  const [guests, setGuests] = useState<string>(() => {
-    // Initialize from local storage or set empty string
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('guests') || "";
-    }
-    return "";
-  });
+  // Initialize state from session storage
+  const initialData = getBookingData();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(initialData.dateRange);
+  const [rooms, setRooms] = useState<string>(initialData.rooms);
+  const [guests, setGuests] = useState<string>(initialData.guests);
+  const [guestCounts, setGuestCounts] = useState(initialData.guestCounts);
 
   const [isRoomsPopoverOpen, setIsRoomsPopoverOpen] = useState(false);
   const [isGuestsPopoverOpen, setIsGuestsPopoverOpen] = useState(false);
@@ -57,46 +84,18 @@ export default function BookingForm({ className }: any) {
       ? differenceInDays(dateRange.to, dateRange.from)
       : 0;
 
-  // Initialize guestCounts from local storage or default
-  const [guestCounts, setGuestCounts] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const storedGuestCounts = localStorage.getItem('guestCounts');
-      if (storedGuestCounts) {
-        return JSON.parse(storedGuestCounts);
-      }
-    }
-    return {
-      Adults: 2,
-      Children: 0,
-      Infants: 0,
-    };
-  });
-
   type GuestType = "Adults" | "Children" | "Infants";
 
-  // Effect to update local storage when dateRange changes
+  // Single effect to update session storage whenever any booking data changes
   useEffect(() => {
-    if (dateRange?.from && dateRange?.to) {
-      localStorage.setItem('dateRange', JSON.stringify({
-        from: dateRange.from.toISOString(),
-        to: dateRange.to.toISOString(),
-      }));
-    } else {
-      localStorage.removeItem('dateRange');
-    }
-  }, [dateRange]);
-
-  // Effect to update local storage when rooms changes
-  useEffect(() => {
-    localStorage.setItem('rooms', rooms);
-  }, [rooms]);
-
-  // Effect to update local storage when guests and guestCounts changes
-  useEffect(() => {
-    localStorage.setItem('guests', guests);
-    localStorage.setItem('guestCounts', JSON.stringify(guestCounts));
-  }, [guests, guestCounts]);
-
+    const bookingData: BookingData = {
+      dateRange,
+      rooms,
+      guests,
+      guestCounts
+    };
+    saveBookingData(bookingData);
+  }, [dateRange, rooms, guests, guestCounts]);
 
   function handleBookNow() {
     // Construct query parameters for the rooms page
@@ -127,7 +126,6 @@ export default function BookingForm({ className }: any) {
       }
 
       const updated = { ...prev, [type]: newCount };
-      // updateGuestsText(updated); // This will be called by the useEffect on guestCounts change
       return updated;
     });
   }
@@ -154,11 +152,11 @@ export default function BookingForm({ className }: any) {
   // Initial update of guest text on component mount
   useEffect(() => {
     updateGuestsText(guestCounts);
-  }, []); // Run once on mount
+  }, [guestCounts]);
 
   function handleGuestsApply() {
     updateGuestsText(guestCounts);
-    setIsGuestsPopoverOpen(false); // Close popover on apply
+    setIsGuestsPopoverOpen(false);
   }
 
   // Updated calendar component with proper separator between months in PC view
