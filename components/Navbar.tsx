@@ -6,17 +6,6 @@ import Image from "next/image"
 import { Menu, User, LogOut, ChevronDown, X, Home, Users, Phone, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetClose,
-} from "@/components/ui/sheet"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
