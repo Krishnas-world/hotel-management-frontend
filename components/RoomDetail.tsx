@@ -77,44 +77,73 @@ const ImageGallery = ({ images, roomName }: ImageGalleryProps) => {
 
     if (showAllPhotos) {
         return (
-            <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-                <div className="relative w-full max-w-5xl bg-gray-900 rounded-xl overflow-hidden">
-                    <div className="flex justify-between items-center p-4 border-b border-gray-700">
-                        <h2 className="text-white text-xl font-semibold">{roomName} - All Photos</h2>
-                        <button onClick={() => setShowAllPhotos(false)} className="text-white hover:text-gray-300 p-2">
-                            <X size={24} />
+            <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="relative w-full max-w-6xl bg-white dark:bg-gray-950 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800">
+                    {/* Header */}
+                    <div className="flex justify-between items-center p-6 border-b border-amber-100 dark:border-gray-800 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-900 dark:to-gray-900">
+                        <div className="flex items-center gap-3">
+                            <div className="w-2 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
+                            <h2 className="text-gray-900 dark:text-white text-xl font-bold tracking-tight">
+                                {roomName}
+                                <span className="text-amber-600 dark:text-amber-400 ml-2 font-normal">
+                                    - All Photos
+                                </span>
+                            </h2>
+                        </div>
+                        <button
+                            onClick={() => setShowAllPhotos(false)}
+                            className="group p-2 rounded-full bg-white/10 dark:bg-gray-800/50 hover:bg-amber-100 dark:hover:bg-gray-700 transition-all duration-200 border border-amber-200/50 dark:border-gray-700"
+                        >
+                            <X size={22} className="text-gray-700 dark:text-gray-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" />
                         </button>
                     </div>
 
-                    <div className="relative h-[60vh] flex items-center justify-center">
+                    {/* Main Image Container */}
+                    <div className="relative h-[65vh] flex items-center justify-center bg-gradient-to-br from-gray-50 to-amber-50/30 dark:from-gray-900 dark:to-gray-800">
                         <img
                             src={images[currentIndex]}
                             alt={`${roomName} photo ${currentIndex + 1}`}
-                            className="object-contain w-full h-full"
-                            onError={(e) => e.currentTarget.src = 'https://placehold.co/1000x700/FFA500/FFFFFF?text=Image+Error'}
+                            className="object-contain w-full h-full rounded-lg"
+                            onError={(e) => e.currentTarget.src = 'https://placehold.co/1200x800/F59E0B/FFFFFF?text=Image+Loading...'}
                         />
-                        <button onClick={() => navigate('prev')}
-                            className="absolute left-4 p-3 bg-white/20 hover:bg-white/40 rounded-full text-white">
-                            <ChevronLeft size={24} />
+
+                        {/* Navigation Buttons */}
+                        <button
+                            onClick={() => navigate('prev')}
+                            className="absolute left-6 p-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700 rounded-full text-gray-700 dark:text-gray-200 shadow-lg border border-amber-200/30 dark:border-gray-600 transition-all duration-200 hover:scale-105 hover:shadow-xl group"
+                        >
+                            <ChevronLeft size={24} className="group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" />
                         </button>
-                        <button onClick={() => navigate('next')}
-                            className="absolute right-4 p-3 bg-white/20 hover:bg-white/40 rounded-full text-white">
-                            <ChevronRight size={24} />
+                        <button
+                            onClick={() => navigate('next')}
+                            className="absolute right-6 p-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700 rounded-full text-gray-700 dark:text-gray-200 shadow-lg border border-amber-200/30 dark:border-gray-600 transition-all duration-200 hover:scale-105 hover:shadow-xl group"
+                        >
+                            <ChevronRight size={24} className="group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" />
                         </button>
+
+                        {/* Image Counter */}
+                        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-black/70 backdrop-blur-sm text-white text-sm rounded-full border border-white/20">
+                            {currentIndex + 1} of {images.length}
+                        </div>
                     </div>
 
-                    <div className="p-4 flex gap-2 overflow-x-auto">
-                        {images.map((image, index) => (
-                            <img
-                                key={index}
-                                src={image}
-                                alt={`Thumbnail ${index + 1}`}
-                                className={`w-20 h-16 object-cover rounded cursor-pointer border-2 transition-all ${currentIndex === index ? 'border-orange-500' : 'border-transparent hover:border-orange-400'
-                                    }`}
-                                onClick={() => setCurrentIndex(index)}
-                                onError={(e) => e.currentTarget.src = 'https://placehold.co/200x160/FFA500/FFFFFF?text=Thumb'}
-                            />
-                        ))}
+                    {/* Thumbnail Strip */}
+                    <div className="p-6 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-gray-900 dark:to-gray-800 border-t border-amber-100 dark:border-gray-800">
+                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-amber-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                            {images.map((image, index) => (
+                                <img
+                                    key={index}
+                                    src={image}
+                                    alt={`Thumbnail ${index + 1}`}
+                                    className={`flex-shrink-0 w-24 h-20 object-cover rounded-lg cursor-pointer border-3 transition-all duration-200 hover:scale-105 ${currentIndex === index
+                                            ? 'border-amber-500 shadow-lg shadow-amber-500/30 ring-2 ring-amber-200 dark:ring-amber-400/50'
+                                            : 'border-gray-200 dark:border-gray-600 hover:border-amber-300 dark:hover:border-amber-400 hover:shadow-md'
+                                        }`}
+                                    onClick={() => setCurrentIndex(index)}
+                                    onError={(e) => e.currentTarget.src = 'https://placehold.co/200x160/F59E0B/FFFFFF?text=Thumb'}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -23,13 +23,11 @@ import {
   Filter,
   SlidersHorizontal,
   X,
-  Loader2
 } from "lucide-react";
 import BookingForm from "@/components/BookingForm";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 
-// Types
 interface BackendRoom {
   id: string;
   roomName: string;
