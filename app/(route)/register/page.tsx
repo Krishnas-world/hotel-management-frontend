@@ -2,7 +2,7 @@
 
 "use client"
 import React, { useState } from 'react';
-import { Mail, Lock, User, Loader2, EyeOff, Eye } from 'lucide-react';
+import { Mail, Lock, User, Loader2, EyeOff, Eye, Phone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -187,6 +187,7 @@ const Register: React.FC = () => {
           fullName: formData.username, // Assuming username is used as fullName in backend
           email: formData.email,
           password: formData.password,
+          phone: formData.phone, // Include phone number if required by backend
         }),
         credentials: 'include', 
       });
@@ -324,6 +325,20 @@ const Register: React.FC = () => {
               required
               autoComplete="email"
               disabled={isSubmitting} // Disable form fields while submitting
+            />
+
+            <FormInput
+              label="Phone Number"
+              type="number"
+              name="phone"
+              id="phone"
+              placeholder="1234567890"
+              icon={<Phone size={18} />}
+              value={formData.phone}
+              onChange={handleChange}
+              error={errors.phone}
+              required
+              autoComplete="phone"
             />
 
             <div>
