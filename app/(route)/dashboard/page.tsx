@@ -1,17 +1,14 @@
-// page.tsx (or the parent component that renders Dashboard)
 "use client"
 import Dashboard from '@/components/Dashboard'
-import Navbar from '@/components/Navbar';
-import React, { useEffect, useState, useCallback } from 'react' // Import useCallback
+import React, { useEffect, useState} from 'react'
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation'; // Import useRouter for redirection
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter(); // Initialize router
+  const router = useRouter(); 
 
-  // Authentication check
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
@@ -28,21 +25,20 @@ export default function Page() {
           setUser(null);
           console.log("User is not authenticated.");
           toast.error("You are not authenticated. Please log in.");
-          router.push('/login'); // Redirect to login if not authenticated
+          router.push('/login'); 
         }
       } catch (error) {
         console.error("Page: Error checking auth status:", error);
         setUser(null);
         toast.error("Failed to connect to the server or authenticate.");
-        router.push('/login'); // Redirect to login on error
+        router.push('/login'); 
       } finally {
         setLoading(false);
       }
     };
 
     checkAuthStatus();
-  }, [router]); // Add router to dependency array
-
+  }, [router]); 
 const handleLogout = async () => {
     console.log("Attempting to log out...");
     try {
